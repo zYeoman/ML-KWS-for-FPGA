@@ -19,12 +19,10 @@
 #ifndef __KWS_MFCC_H__
 #define __KWS_MFCC_H__
 
-#include "math.h"
-#include "string.h"
-#include <vector>
+#include <math.h>
+#include <string.h>
 #include <complex>
-#include <bitset>
-#include <iostream>
+#include <vector>
 
 using namespace std;
 

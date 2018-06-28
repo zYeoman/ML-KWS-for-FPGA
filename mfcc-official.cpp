@@ -26,10 +26,10 @@
 #include "float.h"
 
 
-void FFT(const unsigned long & fftlen, vector<complex<float> >& vec)
+void FFT(const uint64_t & fftlen, vector<complex<float> >& vec)
 {
-  unsigned long ulPower = 0;
-  unsigned long fftlen1 = fftlen - 1;
+  uint64_t ulPower = 0;
+  uint64_t fftlen1 = fftlen - 1;
   while(fftlen1 > 0)
   {
     ulPower++;
@@ -37,17 +37,15 @@ void FFT(const unsigned long & fftlen, vector<complex<float> >& vec)
   }
 
 
-  bitset<sizeof(unsigned long) * 8> bsIndex;
-  unsigned long ulIndex;
-  unsigned long ulK;
-  for(unsigned long p = 0; p < fftlen; p++)
+  uint64_t ulIndex;
+  uint64_t ulK;
+  for(uint64_t p = 0; p < fftlen; p++)
   {
     ulIndex = 0;
     ulK = 1;
-    bsIndex = bitset<sizeof(unsigned long) * 8>(p);
-    for(unsigned long j = 0; j < ulPower; j++)
+    for(uint64_t j = 0; j < ulPower; j++)
       {
-        ulIndex += bsIndex.test(ulPower - j - 1) ? ulK : 0;
+        ulIndex += (p&(1<<(ulPower - j - 1)))? ulK : 0;
         ulK *= 2;
       }
 
@@ -61,26 +59,26 @@ void FFT(const unsigned long & fftlen, vector<complex<float> >& vec)
 
 
   vector<complex<float> > vecW;
-  for(unsigned long i = 0; i < fftlen / 2; i++)
+  for(uint64_t i = 0; i < fftlen / 2; i++)
     {
       vecW.push_back(complex<float>(cos(M_2PI * i / fftlen) , -1 * sin(M_2PI * i / fftlen)));
     }
 
 
 
-  unsigned long ulGroupLength = 1;
-  unsigned long ulHalfLength = 0;
-  unsigned long ulGroupCount = 0;
+  uint64_t ulGroupLength = 1;
+  uint64_t ulHalfLength = 0;
+  uint64_t ulGroupCount = 0;
   complex<float> cw;
   complex<float> c1;
   complex<float> c2;
-  for(unsigned long b = 0; b < ulPower; b++)
+  for(uint64_t b = 0; b < ulPower; b++)
     {
       ulHalfLength = ulGroupLength;
       ulGroupLength *= 2;
-      for(unsigned long j = 0; j < fftlen; j += ulGroupLength)
+      for(uint64_t j = 0; j < fftlen; j += ulGroupLength)
         {
-          for(unsigned long k = 0; k < ulHalfLength; k++)
+          for(uint64_t k = 0; k < ulHalfLength; k++)
             {
               cw = vecW[k * fftlen / ulGroupLength] * vec[j + k + ulHalfLength];
               c1 = vec[j + k] + cw;
