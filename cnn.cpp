@@ -1,8 +1,9 @@
-/*
- * cnnn.cpp
- * Copyright (C) 2018 Yongwen Zhuang <zeoman@163.com>
- *
- * Distributed under terms of the MIT license.
+/**
+ * @file cnn.cpp
+ * @brief Use CNN for key word spotting
+ * @author Yongwen Zhuang
+ * @version 0.1
+ * @date 2018-06-28
  */
 
 #include "cnn.h"

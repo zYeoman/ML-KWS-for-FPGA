@@ -1,12 +1,14 @@
-/*
- * Description: MFCC feature extraction to match with TensorFlow MFCC Op
+/**
+ * @file mfcc.cpp
+ * @brief MFCC feature extraction to match with TensorFlow MFCC Op
+ * @author Yongwen Zhuang
+ * @version 0.1
+ * @date 2018-06-28
  */
 
-#include <string.h>
 
 #include "mfcc.h"
 #include "float.h"
-#include "stdio.h"
 
 float mfcc_frame[FILTER_LEN];
 float mfcc_buffer[FILTER_LEN];
@@ -55,7 +57,6 @@ void FFT(const uint64_t & fftlen, vector<complex<float> >& vec)
 
   uint64_t ulGroupLength = 1;
   uint64_t ulHalfLength = 0;
-  uint64_t ulGroupCount = 0;
   complex<float> cw;
   complex<float> c1;
   complex<float> c2;

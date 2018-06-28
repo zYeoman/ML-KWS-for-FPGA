@@ -1,3 +1,11 @@
+/**
+ * @file test_cnn.cpp
+ * @brief KWS test
+ * @author Yongwen Zhuang
+ * @version 0.1
+ * @date 2018-06-28
+ */
+
 #include <stdio.h>
 #include "cnn.h"
 #include "timer.h"
