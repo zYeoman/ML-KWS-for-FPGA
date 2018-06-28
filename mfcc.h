@@ -16,7 +16,6 @@
 #include <string.h>
 #include <float.h>
 #include <complex>
-#include <vector>
 
 using namespace std;
 
@@ -27,6 +26,7 @@ using namespace std;
 #define MEL_HIGH_FREQ 4000
 #define NUM_MFCC_FEATURES 10
 #define FILTER_LEN 1024
+#define FILTER_POW 10
 #define FRAME_LEN 640
 
 #define M_2PI 6.283185307179586476925286766559005

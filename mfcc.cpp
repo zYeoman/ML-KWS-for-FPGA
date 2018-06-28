@@ -8,33 +8,23 @@
 
 
 #include "mfcc.h"
-#include "float.h"
 
 float mfcc_frame[FILTER_LEN];
 float mfcc_buffer[FILTER_LEN];
 float mel_energies[NUM_FBANK_BINS];
 
 
-void FFT(const uint64_t & fftlen, vector<complex<float> >& vec)
+void FFT(complex<float>*  vec)
 {
-  uint64_t ulPower = 0;
-  uint64_t fftlen1 = fftlen - 1;
-  while(fftlen1 > 0)
-  {
-    ulPower++;
-    fftlen1=fftlen1/2;
-  }
-
-
-  uint64_t ulIndex;
-  uint64_t ulK;
-  for(uint64_t p = 0; p < fftlen; p++)
+  uint16_t ulIndex;
+  uint16_t ulK;
+  for(uint16_t p = 0; p < FILTER_LEN; p++)
   {
     ulIndex = 0;
     ulK = 1;
-    for(uint64_t j = 0; j < ulPower; j++)
+    for(uint16_t j = 0; j < FILTER_POW; j++)
       {
-        ulIndex += (p&(1<<(ulPower - j - 1)))? ulK : 0;
+        ulIndex += (p&(1<<(FILTER_POW - j - 1)))? ulK : 0;
         ulK *= 2;
       }
 
@@ -47,28 +37,24 @@ void FFT(const uint64_t & fftlen, vector<complex<float> >& vec)
   }
 
 
-  vector<complex<float> > vecW;
-  for(uint64_t i = 0; i < fftlen / 2; i++)
-    {
-      vecW.push_back(complex<float>(cos(M_2PI * i / fftlen) , -1 * sin(M_2PI * i / fftlen)));
-    }
+  complex<float> vecW[FILTER_LEN/2];
+  for(uint16_t i = 0; i < FILTER_LEN / 2; i++)
+      vecW[i] = complex<float>(cos(M_2PI * i / FILTER_LEN) , -1 * sin(M_2PI * i / FILTER_LEN));
 
-
-
-  uint64_t ulGroupLength = 1;
-  uint64_t ulHalfLength = 0;
+  uint16_t ulGroupLength = 1;
+  uint16_t ulHalfLength = 0;
   complex<float> cw;
   complex<float> c1;
   complex<float> c2;
-  for(uint64_t b = 0; b < ulPower; b++)
+  for(uint16_t b = 0; b < FILTER_POW; b++)
     {
       ulHalfLength = ulGroupLength;
       ulGroupLength *= 2;
-      for(uint64_t j = 0; j < fftlen; j += ulGroupLength)
+      for(uint16_t j = 0; j < FILTER_LEN; j += ulGroupLength)
         {
-          for(uint64_t k = 0; k < ulHalfLength; k++)
+          for(uint16_t k = 0; k < ulHalfLength; k++)
             {
-              cw = vecW[k * fftlen / ulGroupLength] * vec[j + k + ulHalfLength];
+              cw = vecW[k * FILTER_LEN / ulGroupLength] * vec[j + k + ulHalfLength];
               c1 = vec[j + k] + cw;
               c2 = vec[j + k] - cw;
               vec[j + k] = c1;
@@ -94,11 +80,11 @@ void mfcc_compute(const int16_t * audio_data, float* mfcc_out) {
   }
 
   //Compute FFT
-  // arm_rfft_fast_f32(rfft, frame, mfcc_buffer, 0);
-  vector<complex<float> > zero_padded;
-  zero_padded.assign(mfcc_frame, mfcc_frame+FRAME_LEN);
-  zero_padded.resize(FILTER_LEN, 0);
-  FFT(FILTER_LEN, zero_padded);
+  complex<float> zero_padded[FILTER_LEN]={0};
+  for (int i = 0; i < FRAME_LEN; ++i) {
+      zero_padded[i] = mfcc_frame[i];
+  }
+  FFT(zero_padded);
   //Convert to power spectrum
   //frame is stored as [real0, realN/2-1, real1, im1, real2, im2, ...]
   int32_t half_dim = FILTER_LEN/2;
