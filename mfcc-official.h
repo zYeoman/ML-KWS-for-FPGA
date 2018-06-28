@@ -32,6 +32,25 @@ using namespace std;
 #define MEL_HIGH_FREQ 4000
 
 #define M_2PI 6.283185307179586476925286766559005
+typedef struct     // WAV stores wave file header
+{
+        int rId;
+        int rLen;
+        int wId;
+        int fId;
+
+        int fLen;
+
+        short wFormatTag;
+        short nChannels;
+        int nSamplesPerSec;   // Sampling rate. This returns to FS variable
+        int nAvgBytesPerSec;  // All other parameters are not used in processing
+        short nBlockAlign;
+        short wBitsPerSample;
+        int dId;
+        int wSampleLength;
+}WAV;
+
 
 class MFCC{
   private:

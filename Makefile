@@ -3,12 +3,11 @@
 # Yongwen Zhuang, 2018-06-28 13:48
 #
 
-all: mfcc gt.csv
-	./mfcc 1.wav > tmp.csv
-	diff tmp.csv gt.csv
+all: mfcc
+	./mfcc 1.wav
 
-mfcc: compute-mfcc.cc mfcc-official.cpp mfcc-official.h
-	g++ compute-mfcc.cc mfcc-official.cpp -o mfcc --std=c++11
+mfcc: mfcc-official.cpp mfcc-official.h main.cpp timer.h
+	g++ main.cpp mfcc-official.cpp -o mfcc
 
 
 # vim:ft=make
