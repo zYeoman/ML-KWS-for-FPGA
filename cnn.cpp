@@ -38,7 +38,7 @@ void kws(int16_t *data_in, int16_t *data_out){
     dense(fc2_w, fc2_b, dense1, dense2, 128, 12, false);
     float output_max = -1e10;
     int output_label = 0;
-    for(int o = 0; o < 10; o++) {
+    for(int o = 0; o < 12; o++) {
         if(dense2[o] > output_max) {
             output_max = dense2[o];
             output_label = o;

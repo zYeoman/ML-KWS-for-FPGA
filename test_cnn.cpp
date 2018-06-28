@@ -9,8 +9,13 @@
 #include <stdio.h>
 #include "cnn.h"
 #include "timer.h"
+#include "test.h"
 
-#define TESTING_SIZE 1
+#define DEBUG 0
+#define D \
+        do { if (DEBUG) fprintf(stderr, "%s:%d:%s(): \n", __FILE__, \
+        __LINE__, __func__); } while (0)
+
 typedef struct     // WAV stores wave file header
 {
         int rId;
@@ -30,32 +35,27 @@ typedef struct     // WAV stores wave file header
         int wSampleLength;
 }WAV;
 
-int main(int argc, char *argv[]){
+int main(){
     int counter = 0;
     // Assign variables
-    int numCepstra = 10;
-    int samplingRate = 16000;
-    int winLength = 40;
-    int frameShift = 20;
-    int frame_len = winLength*samplingRate/1000;
-    int frame_shift = frameShift*samplingRate/1000;
 
     WAV header;
     int16_t buffer[16000];
     FILE *sourcefile;
-    sourcefile=fopen("1.wav","rb");
-    fread(&header,sizeof(WAV),1,sourcefile);
-    fread(&buffer,sizeof(int16_t),16000,sourcefile);
-    Timer my_timer("timer", true);
-    for(int i = 0; i < TESTING_SIZE; i++) {
+    Timer my_timer("timer", false);
+    for(int i = 0; i < TEST_NUM; i++) {
+        my_timer.start();
+        sourcefile=fopen(test_filename[i].c_str(),"rb");
+        fread(&header,sizeof(WAV),1,sourcefile);
+        fread(&buffer,sizeof(int16_t),16000,sourcefile);
         int16_t res;
         kws(buffer, &res);
-        printf("Label: %d\n", res);
-        /* if(output_label == testing_label[i]) { */
-        /*     counter++; */
-        /* } */
+        if(res == test_label[i]) {
+            counter++;
+        }
+        fclose(sourcefile);
+        my_timer.stop();
     }
-    my_timer.stop();
-    printf("Accuracy: %d/%d\n", counter, TESTING_SIZE);
+    printf("Accuracy: %d/%d=%f\n", counter, TEST_NUM, counter/float(TEST_NUM));
     return 0;
 }
