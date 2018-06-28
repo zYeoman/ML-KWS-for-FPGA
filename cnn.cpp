@@ -19,8 +19,7 @@ void kws(int16_t *data_in, int16_t *data_out){
     float input[49*10];
     for (int i=0;i<16000;i++)
         buffer[i] = *data_in++;
-    MFCC mfccComputer(8);
-    compute(mfccComputer, buffer, input);
+    compute(buffer, input);
     float conv1[40*7*28];
     conv(conv1_w, conv1_b, input, conv1, 4, 10, 10, 49, 1, 28, false, 1, 1);
     bn(bn1_gamma, bn1_beta, bn1_mm, bn1_mv, conv1, 40, 7, 28);
@@ -47,9 +46,9 @@ void kws(int16_t *data_in, int16_t *data_out){
     *data_out++=output_label;
 }
 
-int compute(MFCC& mfccComputer, int16_t* input, float* output) {
+int compute(int16_t* input, float* output) {
     for(int j=0;j<49;j++) {
-        mfccComputer.mfcc_compute(input+320*j, output+10*j);
+        mfcc_compute(input+320*j, output+10*j);
     }
     return 0;
 }

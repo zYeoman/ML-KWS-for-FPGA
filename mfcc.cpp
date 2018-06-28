@@ -8,6 +8,10 @@
 #include "float.h"
 #include "stdio.h"
 
+float mfcc_frame[FILTER_LEN];
+float mfcc_buffer[FILTER_LEN];
+float mel_energies[NUM_FBANK_BINS];
+
 
 void FFT(const uint64_t & fftlen, vector<complex<float> >& vec)
 {
@@ -73,30 +77,25 @@ void FFT(const uint64_t & fftlen, vector<complex<float> >& vec)
     }
 }
 
-MFCC::MFCC(int mfcc_dec_bits)
-: mfcc_dec_bits(mfcc_dec_bits)
-{
-}
-
-void MFCC::mfcc_compute(const int16_t * audio_data, float* mfcc_out) {
+void mfcc_compute(const int16_t * audio_data, float* mfcc_out) {
 
   int32_t i, j, bin;
 
   //TensorFlow way of normalizing .wav data to (-1,1)
   for (i = 0; i < FRAME_LEN; i++) {
-    frame[i] = (float)audio_data[i]/(1<<15);
+    mfcc_frame[i] = (float)audio_data[i]/(1<<15);
   }
   //Fill up remaining with zeros
-  memset(&frame[FRAME_LEN], 0, sizeof(float) * (FILTER_LEN-FRAME_LEN));
+  memset(&mfcc_frame[FRAME_LEN], 0, sizeof(float) * (FILTER_LEN-FRAME_LEN));
 
   for (i = 0; i < FRAME_LEN; i++) {
-    frame[i] *= window_func[i];
+    mfcc_frame[i] *= window_func[i];
   }
 
   //Compute FFT
-  // arm_rfft_fast_f32(rfft, frame, buffer, 0);
+  // arm_rfft_fast_f32(rfft, frame, mfcc_buffer, 0);
   vector<complex<float> > zero_padded;
-  zero_padded.assign(frame, frame+FRAME_LEN);
+  zero_padded.assign(mfcc_frame, mfcc_frame+FRAME_LEN);
   zero_padded.resize(FILTER_LEN, 0);
   FFT(FILTER_LEN, zero_padded);
   //Convert to power spectrum
@@ -106,10 +105,10 @@ void MFCC::mfcc_compute(const int16_t * audio_data, float* mfcc_out) {
         last_energy =  zero_padded[half_dim-1].real() * zero_padded[half_dim-1].real();  // handle this special case
   for (i = 1; i < half_dim; i++) {
     float real = zero_padded[i].real(), im = zero_padded[i].imag();
-    buffer[i] = real*real + im*im;
+    mfcc_buffer[i] = real*real + im*im;
   }
-  buffer[0] = first_energy;
-  buffer[half_dim] = last_energy;
+  mfcc_buffer[0] = first_energy;
+  mfcc_buffer[half_dim] = last_energy;
 
   float sqrt_data;
   //Apply mel filterbanks
@@ -119,7 +118,7 @@ void MFCC::mfcc_compute(const int16_t * audio_data, float* mfcc_out) {
     int32_t last_index = fbank_filter_last[bin];
     j = 0;
     for (i = first_index; i <= last_index; i++) {
-      sqrt_data = sqrt(buffer[i]);
+      sqrt_data = sqrt(mfcc_buffer[i]);
       mel_energy += (sqrt_data) * mel_fbank[bin*NUM_FBANK_MAXW+j++];
     }
     mel_energies[bin] = mel_energy;

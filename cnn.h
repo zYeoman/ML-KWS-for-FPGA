@@ -25,6 +25,6 @@ void dense(const float* weight, const float* bias, float* data, float* output_da
     int i_num, int o_num, bool relu);
 void conv(const float* weight, const float* bias, float* data, float* output_data,
     int k_w, int k_h, int i_w, int i_h, int k_c, int o_c, bool relu, int h_s, int w_s);
-int compute(MFCC& mfccComputer, int16_t* input, float* output);
+int compute(int16_t* input, float* output);
 float relu(float x);
 #endif /* !CNN_H */

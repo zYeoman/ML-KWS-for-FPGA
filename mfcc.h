@@ -41,31 +41,22 @@ using namespace std;
 
 #define M_2PI 6.283185307179586476925286766559005
 
-class MFCC{
-  private:
-    int mfcc_dec_bits;
-    float frame[FILTER_LEN];
-    float buffer[FILTER_LEN];
-    float mel_energies[NUM_FBANK_BINS];
-    const float window_func[FRAME_LEN]={
-        #include "hamm_window.dat"
-    };
-    const int32_t fbank_filter_first[NUM_FBANK_BINS]={
-        #include "mel_first_index.dat"
-    };
-    const int32_t fbank_filter_last[NUM_FBANK_BINS]={
-        #include "mel_last_index.dat"
-    };
-    const float mel_fbank[NUM_FBANK_BINS*NUM_FBANK_MAXW]={
-        #include "mel_fbank.dat"
-    };
-    const float dct_matrix[NUM_FBANK_BINS*NUM_MFCC_FEATURES]={
-        #include "dct_matrix.dat"
-    };
-
-  public:
-    MFCC(int mfcc_dec_bits);
-    void mfcc_compute(const int16_t* data, float* mfcc_out);
+const float window_func[FRAME_LEN]={
+    #include "hamm_window.dat"
 };
+const int32_t fbank_filter_first[NUM_FBANK_BINS]={
+    #include "mel_first_index.dat"
+};
+const int32_t fbank_filter_last[NUM_FBANK_BINS]={
+    #include "mel_last_index.dat"
+};
+const float mel_fbank[NUM_FBANK_BINS*NUM_FBANK_MAXW]={
+    #include "mel_fbank.dat"
+};
+const float dct_matrix[NUM_FBANK_BINS*NUM_MFCC_FEATURES]={
+    #include "dct_matrix.dat"
+};
+
+void mfcc_compute(const int16_t* data, float* mfcc_out);
 
 #endif
