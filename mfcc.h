@@ -13,6 +13,7 @@
 #else
 #include <math.h>
 #endif
+#include <stdint.h>
 #include <string.h>
 #include <float.h>
 #include <complex>
