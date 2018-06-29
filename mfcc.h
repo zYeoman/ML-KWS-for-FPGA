@@ -8,15 +8,11 @@
 #ifndef __KWS_MFCC_H__
 #define __KWS_MFCC_H__
 
-#ifdef __SYNTHESIS__
-#include "hls_math.h"
-#else
 #include <math.h>
-#endif
-#include <stdint.h>
 #include <string.h>
 #include <float.h>
-#include <complex>
+
+#include "typedef.h"
 
 using namespace std;
 
@@ -35,10 +31,10 @@ using namespace std;
 const float window_func[FRAME_LEN]={
     #include "hamm_window.dat"
 };
-const int32_t fbank_filter_first[NUM_FBANK_BINS]={
+const uint8_t fbank_filter_first[NUM_FBANK_BINS]={
     #include "mel_first_index.dat"
 };
-const int32_t fbank_filter_last[NUM_FBANK_BINS]={
+const uint8_t fbank_filter_last[NUM_FBANK_BINS]={
     #include "mel_last_index.dat"
 };
 const float mel_fbank[NUM_FBANK_BINS*NUM_FBANK_MAXW]={

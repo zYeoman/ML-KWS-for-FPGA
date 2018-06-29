@@ -13,7 +13,7 @@ CFLAGS = -Wall -O3
 default: $(TARGET)
 all: default
 
-OBJECTS = $(patsubst %.cpp, %.o, $(wildcard *.cpp))
+OBJECTS = cnn.o mfcc.o fft.o test_cnn.o
 HEADERS = $(wildcard *.h)
 
 %.o: %.cpp $(HEADERS)

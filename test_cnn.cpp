@@ -44,7 +44,8 @@ int main(int argc, char *argv[]) {
     // Assign variables
 
     WAV header;
-    int16_t buffer[16000];
+    uint32_t buffer[8000];
+    int32_t res;
     FILE *sourcefile;
     Timer my_timer("timer", false);
     for(int i = 0; i < test_num; i++) {
@@ -58,7 +59,6 @@ int main(int argc, char *argv[]) {
             printf("READ %s CONTENT FAILURE\n", test_filename[i].c_str());
             return 1;
         }
-        int16_t res;
         kws(buffer, &res);
         if(res == test_label[i]) {
             counter++;

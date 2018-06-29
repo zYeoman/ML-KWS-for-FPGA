@@ -12,14 +12,19 @@
 #define TESTING_SIZE 1
 
 
-void kws(int16_t *data_in, int16_t *data_out){
-#pragma HLS interface axis port=data_in
-#pragma HLS interface axis port=data_out
+void kws(uint32_t *data_in, int32_t *data_out){
+//void kws(int16_t *data_in, int32_t *data_out){
+#pragma HLS interface axis port=data_in depth=128
+#pragma HLS interface axis port=data_out depth=1
 #pragma HLS interface ap_ctrl_none port=return
     int16_t buffer[16000];
     float input[49*10];
-    for (int i=0;i<16000;i++)
-        buffer[i] = *data_in++;
+    uint32_t tmp;
+    for (int i=0;i<8000;i++){
+        tmp = *data_in++;
+        buffer[2*i] = (int16_t)(tmp&0xFFFF);
+        buffer[2*i+1] = (int16_t)(tmp>>16);
+    }
     compute(buffer, input);
     float conv1[40*7*28];
     conv(conv1_w, conv1_b, input, conv1, 4, 10, 10, 49, 1, 28, false, 1, 1);
@@ -56,7 +61,7 @@ int compute(int16_t* input, float* output) {
 
 //weights: HWCN
 //activations: HWC
-void conv(const float* weight, const float* bias, float* data, float* output_data,
+void conv(const ffloat* weight, const ffloat* bias, float* data, float* output_data,
     int k_w, int k_h, int i_w, int i_h, int k_c, int o_c, bool relu, int h_s, int w_s) {
     int o_w = (int)floor((float)(i_w - k_w) / (float)w_s) + 1;
     int o_h = (int)floor((float)(i_h - k_h) / (float)h_s) + 1;
@@ -83,7 +88,7 @@ void conv(const float* weight, const float* bias, float* data, float* output_dat
 }
 
 //weight:IO
-void dense(const float* weight, const float* bias, float* data, float* output_data,
+void dense(const ffloat* weight, const ffloat* bias, float* data, float* output_data,
     int i_num, int o_num, bool relu) {
     for(int o = 0; o < o_num; o++) {
         output_data[o] = 0;
@@ -98,7 +103,7 @@ void dense(const float* weight, const float* bias, float* data, float* output_da
 }
 
 //activation:HWC
-void bn(const float* gamma, const float* beta, const float* mm, const float* mv,
+void bn(const ffloat* gamma, const ffloat* beta, const ffloat* mm, const ffloat* mv,
     float* data, const int h, const int w, const int c) {
     float epsilon = 0.001;
     for(int c_i = 0; c_i < c; c_i++) {
