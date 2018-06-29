@@ -7,6 +7,7 @@
  */
 
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include "cnn.h"
 #include "timer.h"
@@ -49,8 +50,14 @@ int main(int argc, char *argv[]) {
     for(int i = 0; i < test_num; i++) {
         my_timer.start();
         sourcefile=fopen(test_filename[i].c_str(),"rb");
-        fread(&header,sizeof(WAV),1,sourcefile);
-        fread(&buffer,sizeof(int16_t),16000,sourcefile);
+        if(!fread(&header,sizeof(WAV),1,sourcefile)) {
+            printf("READ %s HEAD FAILURE\n", test_filename[i].c_str());
+            return 1;
+        }
+        if(!fread(&buffer,sizeof(int16_t),16000,sourcefile)) {
+            printf("READ %s CONTENT FAILURE\n", test_filename[i].c_str());
+            return 1;
+        }
         int16_t res;
         kws(buffer, &res);
         if(res == test_label[i]) {
@@ -59,6 +66,6 @@ int main(int argc, char *argv[]) {
         fclose(sourcefile);
         my_timer.stop();
     }
-    printf("Accuracy: %d/%d=%f\n", counter, TEST_NUM, counter/float(TEST_NUM));
+    printf("Accuracy: %d/%d=%f\n", counter, test_num, counter/float(test_num));
     return 0;
 }

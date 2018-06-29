@@ -1,6 +1,8 @@
 #ifndef __KWS_TEST_H_
 #define __KWS_TEST_H_
 
+#include <string.h>
+
 #define TEST_NUM 3081
 
 const string test_filename[TEST_NUM] = {

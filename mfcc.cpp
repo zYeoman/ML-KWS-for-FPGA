@@ -12,6 +12,12 @@
 float mfcc_frame[FILTER_LEN];
 float mfcc_buffer[FILTER_LEN];
 float mel_energies[NUM_FBANK_BINS];
+float vecW_r[FILTER_LEN/2] = {
+#include "vecW_re.dat"
+};
+float vecW_i[FILTER_LEN/2] = {
+#include "vecW_im.dat"
+};
 
 
 void FFT(complex<float>*  vec)
@@ -37,10 +43,6 @@ void FFT(complex<float>*  vec)
   }
 
 
-  complex<float> vecW[FILTER_LEN/2];
-  for(uint16_t i = 0; i < FILTER_LEN / 2; i++)
-      vecW[i] = complex<float>(cos(M_2PI * i / FILTER_LEN) , -1 * sin(M_2PI * i / FILTER_LEN));
-
   uint16_t ulGroupLength = 1;
   uint16_t ulHalfLength = 0;
   complex<float> cw;
@@ -54,7 +56,8 @@ void FFT(complex<float>*  vec)
         {
           for(uint16_t k = 0; k < ulHalfLength; k++)
             {
-              cw = vecW[k * FILTER_LEN / ulGroupLength] * vec[j + k + ulHalfLength];
+              uint16_t i1=(k*(512>>b)),i2=(j+k+ulHalfLength);
+              cw = complex<float>(vecW_r[i1], vecW_i[i1])*vec[i2];
               c1 = vec[j + k] + cw;
               c2 = vec[j + k] - cw;
               vec[j + k] = c1;
@@ -73,7 +76,9 @@ void mfcc_compute(const int16_t * audio_data, float* mfcc_out) {
     mfcc_frame[i] = (float)audio_data[i]/(1<<15);
   }
   //Fill up remaining with zeros
-  memset(&mfcc_frame[FRAME_LEN], 0, sizeof(float) * (FILTER_LEN-FRAME_LEN));
+  for (i = FRAME_LEN; i < FILTER_LEN; i++) {
+    mfcc_frame[i] = 0;
+  }
 
   for (i = 0; i < FRAME_LEN; i++) {
     mfcc_frame[i] *= window_func[i];
@@ -82,7 +87,7 @@ void mfcc_compute(const int16_t * audio_data, float* mfcc_out) {
   //Compute FFT
   complex<float> zero_padded[FILTER_LEN]={0};
   for (int i = 0; i < FRAME_LEN; ++i) {
-      zero_padded[i] = mfcc_frame[i];
+    zero_padded[i] = mfcc_frame[i];
   }
   FFT(zero_padded);
   //Convert to power spectrum
