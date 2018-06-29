@@ -7,6 +7,7 @@
  */
 
 #include <stdio.h>
+#include <string.h>
 #include "cnn.h"
 #include "timer.h"
 #include "test.h"
@@ -18,32 +19,34 @@
 
 typedef struct     // WAV stores wave file header
 {
-        int rId;
-        int rLen;
-        int wId;
-        int fId;
+        int32_t rId;
+        int32_t rLen;
+        int32_t wId;
+        int32_t fId;
 
-        int fLen;
+        int32_t fLen;
 
-        short wFormatTag;
-        short nChannels;
-        int nSamplesPerSec;   // Sampling rate. This returns to FS variable
-        int nAvgBytesPerSec;  // All other parameters are not used in processing
-        short nBlockAlign;
-        short wBitsPerSample;
-        int dId;
-        int wSampleLength;
+        int16_t wFormatTag;
+        int16_t nChannels;
+        int32_t nSamplesPerSec;   // Sampling rate. This returns to FS variable
+        int32_t nAvgBytesPerSec;  // All other parameters are not used in processing
+        int16_t nBlockAlign;
+        int16_t wBitsPerSample;
+        int32_t dId;
+        int32_t wSampleLength;
 }WAV;
-
-int main(){
+int main(int argc, char *argv[]) {
     int counter = 0;
+    int test_num = TEST_NUM;
+    if (argc > 1)
+        test_num = atoi(argv[1]);
     // Assign variables
 
     WAV header;
     int16_t buffer[16000];
     FILE *sourcefile;
     Timer my_timer("timer", false);
-    for(int i = 0; i < TEST_NUM; i++) {
+    for(int i = 0; i < test_num; i++) {
         my_timer.start();
         sourcefile=fopen(test_filename[i].c_str(),"rb");
         fread(&header,sizeof(WAV),1,sourcefile);

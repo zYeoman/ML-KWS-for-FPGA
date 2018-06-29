@@ -6,8 +6,8 @@
  * @date 2018-06-28
  */
 
-#ifndef CNN_H
-#define CNN_H
+#ifndef __KWS_CNN_H_
+#define __KWS_CNN_H_
 
 #include <stdint.h>
 
