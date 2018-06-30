@@ -59,7 +59,7 @@ int main(int argc, char *argv[]) {
             printf("READ %s CONTENT FAILURE\n", test_filename[i].c_str());
             return 1;
         }
-        kws(buffer, &res);
+        kws_q(buffer, &res);
         if(res == test_label[i]) {
             counter++;
         }
