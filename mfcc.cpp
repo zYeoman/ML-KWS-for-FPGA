@@ -43,14 +43,10 @@ void mfcc_compute(const int16_t * audio_data, float* mfcc_out) {
   //Convert to power spectrum
   //frame is stored as [real0, realN/2-1, real1, im1, real2, im2, ...]
   int32_t half_dim = FILTER_LEN/2;
-  float first_energy = zero_padded[0].real() * zero_padded[0].real(),
-        last_energy =  zero_padded[half_dim-1].real() * zero_padded[half_dim-1].real();  // handle this special case
-  for (i = 1; i < half_dim; i++) {
+  for (i = 0; i < half_dim; i++) {
     float real = zero_padded[i].real(), im = zero_padded[i].imag();
     mfcc_buffer[i] = real*real + im*im;
   }
-  mfcc_buffer[0] = first_energy;
-  mfcc_buffer[half_dim] = last_energy;
 
   float sqrt_data;
   //Apply mel filterbanks
@@ -79,15 +75,6 @@ void mfcc_compute(const int16_t * audio_data, float* mfcc_out) {
       sum += dct_matrix[i*NUM_FBANK_BINS+j] * mel_energies[j];
     }
     mfcc_out[i] = sum;
-    //Input is Qx.mfcc_dec_bits (from quantization step)
-    // sum *= (0x1<<mfcc_dec_bits);
-    // sum = round(sum);
-    // if(sum >= 127)
-    //   mfcc_out[i] = 127;
-    // else if(sum <= -128)
-    //   mfcc_out[i] = -128;
-    // else
-    //   mfcc_out[i] = sum;
   }
 
 }
