@@ -4,6 +4,7 @@
 #
 
 TARGET = kws
+TARGET_HW = kws_hw
 LIBS = -lm
 CC = g++
 CFLAGS = -Wall -O3
@@ -23,6 +24,9 @@ HEADERS = $(wildcard *.h)
 
 $(TARGET): $(OBJECTS)
 	$(CC) $(OBJECTS) -Wall $(LIBS) -o $@
+
+$(TARGET_HW): 
+	$(CC) test_cnn_hw.cpp -Wall $(LIBS) -o $@
 
 clean:
 	-rm -f *.o
