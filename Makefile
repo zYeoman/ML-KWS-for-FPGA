@@ -4,6 +4,7 @@
 #
 
 TARGET = kws
+TARGET_HW = kws_hw
 LIBS = -lm
 CC = g++
 CFLAGS = -Wall -O3
@@ -34,6 +35,9 @@ $(TARGET): $(OBJECTS) test test_q test_crnn
 	$(CC) $(OBJECTS) test.o -Wall $(LIBS) -o kws
 	$(CC) $(OBJECTS) test_q.o -Wall $(LIBS) -o kws_q
 	$(CC) $(OBJECTS) test_crnn.o -Wall $(LIBS) -o kws_crnn
+
+$(TARGET_HW): 
+	$(CC) test_cnn_hw.cpp -Wall $(LIBS) -o $@
 
 clean:
 	-rm -f *.o
