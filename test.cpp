@@ -1,7 +1,6 @@
 /**
  * @file test_cnn.cpp
  * @brief KWS test
- * @author Yongwen Zhuang
  * @version 0.1
  * @date 2018-06-28
  */
@@ -10,6 +9,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "cnn.h"
+#include "crnn.h"
 #include "timer.h"
 #include "test.h"
 
@@ -47,7 +47,13 @@ int main(int argc, char *argv[]) {
     uint32_t buffer[8000];
     int32_t res;
     FILE *sourcefile;
-    Timer my_timer("timer", false);
+#if defined(CRNN)
+    Timer my_timer("CRNN timer", false);
+#elif defined(QUAT)
+    Timer my_timer("CNN_Q timer", false);
+#else
+    Timer my_timer("CNN timer", false);
+#endif
     for(int i = 0; i < test_num; i++) {
         my_timer.start();
         sourcefile=fopen(test_filename[i].c_str(),"rb");
@@ -59,7 +65,13 @@ int main(int argc, char *argv[]) {
             printf("READ %s CONTENT FAILURE\n", test_filename[i].c_str());
             return 1;
         }
+#if defined(CRNN)
+        kws_crnn(buffer, &res);
+#elif defined(QUAT)
         kws_q(buffer, &res);
+#else
+        kws(buffer, &res);
+#endif
         if(res == test_label[i]) {
             counter++;
         }

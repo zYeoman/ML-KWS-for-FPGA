@@ -1,7 +1,6 @@
 /**
  * @file cnn.cpp
  * @brief Use CNN for key word spotting
- * @author Yongwen Zhuang
  * @version 0.1
  * @date 2018-06-28
  */
@@ -9,10 +8,6 @@
 #include "cnn.h"
 #include "model.h"
 #include "model_cnn_q.h"
-
-
-#define TESTING_SIZE 1
-
 
 void kws(uint32_t *data_in, int32_t *data_out){
 //void kws(int16_t *data_in, int32_t *data_out){
@@ -131,6 +126,8 @@ void conv(const ffloat* weight, const ffloat* bias, float* data, float* output_d
                     }
                 }
                 output_data[i_o_h*o_w*o_c + i_o_w*o_c + i_o_c] += bias[i_o_c];
+                if(relu && output_data[i_o_h*o_w*o_c + i_o_w*o_c + i_o_c] < 0)
+                    output_data[i_o_h*o_w*o_c + i_o_w*o_c + i_o_c] = 0;
             }
         }
     }

@@ -13,16 +13,27 @@ CFLAGS = -Wall -O3
 default: $(TARGET)
 all: default
 
-OBJECTS = cnn.o mfcc.o fft.o test_cnn.o
+OBJECTS = cnn.o crnn.o mfcc.o fft.o
 HEADERS = $(wildcard *.h)
 
 %.o: %.cpp $(HEADERS)
 	$(CC) $(CFLAGS) -c $< -o $@
 
+test:
+	$(CC) $(CFLAGS) -c test.cpp -o test.o
+
+test_q:
+	$(CC) $(CFLAGS) -D QUAT -c test.cpp -o test_q.o
+
+test_crnn:
+	$(CC) $(CFLAGS) -D CRNN -c test.cpp -o test_crnn.o
+
 .PRECIOUS: $(TARGET) $(OBJECTS)
 
-$(TARGET): $(OBJECTS)
-	$(CC) $(OBJECTS) -Wall $(LIBS) -o $@
+$(TARGET): $(OBJECTS) test test_q test_crnn
+	$(CC) $(OBJECTS) test.o -Wall $(LIBS) -o kws
+	$(CC) $(OBJECTS) test_q.o -Wall $(LIBS) -o kws_q
+	$(CC) $(OBJECTS) test_crnn.o -Wall $(LIBS) -o kws_crnn
 
 clean:
 	-rm -f *.o

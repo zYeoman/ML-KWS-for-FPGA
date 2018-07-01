@@ -1,7 +1,6 @@
 /**
  * @file cnn.h
  * @brief Use CNN for key word spotting
- * @author Yongwen Zhuang
  * @version 0.1
  * @date 2018-06-28
  */
