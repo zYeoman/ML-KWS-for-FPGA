@@ -68,7 +68,7 @@ int main(int argc, char *argv[]) {
 	//printf("%d\n",nbytes);
         assert(nbytes == sizeof(buffer));
         nbytes = read(fdr, (void *)&res, sizeof(int32_t));
-	printf("%s GT:%d RES:%d\n", test_filename[i].c_str(), test_label[i], res);
+	//printf("%s GT:%d RES:%d\n", test_filename[i].c_str(), test_label[i], res);
         if(res == test_label[i]) {
             counter++;
         }

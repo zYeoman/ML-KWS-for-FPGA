@@ -7,11 +7,11 @@ TARGET = kws
 TARGET_HW = kws_hw
 LIBS = -lm
 CC = g++
-CFLAGS = -Wall -O3
+CFLAGS = -Wall
 
 .PHONY: default all clean
 
-default: $(TARGET)
+default: $(TARGET) $(TARGET_HW)
 all: default
 
 OBJECTS = cnn.o crnn.o mfcc.o fft.o
