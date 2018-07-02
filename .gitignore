@@ -1,2 +1,5 @@
-kws*
+kws
+kws_hw
+kws_q
+kws_crnn
 *.o
