@@ -3,48 +3,38 @@
 # Yongwen Zhuang, 2018-06-28 13:48
 #
 
-TARGET = kws
-TARGET_HW = kws_hw
-LIBS = -lm
-CC = g++
-CFLAGS = -Wall
+CC := clang++
+SRCDIR := src
+BUILDDIR := build
+INCLUDEDIR := include
+TARGET := kws
+CFLAGS := -Wall -O3 -I./$(INCLUDEDIR)
+LIBS := -lm
+SRCEXT := cpp
 
 .PHONY: default all clean
 
-default: $(TARGET) $(TARGET_HW)
+default: $(TARGET)
 all: default
 
-OBJECTS = cnn.o crnn.o mfcc.o fft.o
-HEADERS = $(wildcard *.h)
+SOURCES := $(shell find $(SRCDIR) -type f -name "*.$(SRCEXT)")
+OBJECTS := $(patsubst $(SRCDIR)/%, $(BUILDDIR)/%, $(SOURCES:.$(SRCEXT)=.o))
+HEADERS := $(wildcard $(INCLUDEDIR)/*.h)
 
-%.o: %.cpp $(HEADERS)
+$(BUILDDIR)/%.o: $(SRCDIR)/%.$(SRCEXT) $(HEADERS)
+	@mkdir -p $(BUILDDIR)
 	$(CC) $(CFLAGS) -c $< -o $@
-
-test:
-	$(CC) $(CFLAGS) -c test.cpp -o test.o
-
-test_q:
-	$(CC) $(CFLAGS) -D QUAT -c test.cpp -o test_q.o
-
-test_crnn:
-	$(CC) $(CFLAGS) -D CRNN -c test.cpp -o test_crnn.o
 
 .PRECIOUS: $(TARGET) $(OBJECTS)
 
-$(TARGET): $(OBJECTS) test test_q test_crnn
-	$(CC) $(OBJECTS) test.o -Wall $(LIBS) -o kws
-	$(CC) $(OBJECTS) test_q.o -Wall $(LIBS) -o kws_q
-	$(CC) $(OBJECTS) test_crnn.o -Wall $(LIBS) -o kws_crnn
-
-$(TARGET_HW):
-	$(CC) test_cnn_hw.cpp -Wall $(LIBS) -o $@
+$(TARGET): $(OBJECTS)
+	@echo " Linking... "
+	$(CC) $(OBJECTS) $(CFLAGS) $(LIBS) -o $(TARGET)
 
 clean:
-	-rm -f *.o
-	-rm -f kws
-	-rm -f kws_q
-	-rm -f kws_crnn
-	-rm -f $(TARGET_HW)
+	@echo " Cleaning... "
+	-rm -rf $(BUILDDIR)
+	-rm -rf $(TARGET)
 
 # vim:ft=make
 #
