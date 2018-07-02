@@ -66,43 +66,45 @@ void conv_bn_q(const int8_t *weight, const int8_t *bias, const int8_t *bn_m1,
                int out_q, int m1_q, int m2_q) {
   int o_w = (int)floor((float)(i_w - k_w) / (float)w_s) + 1;
   int o_h = (int)floor((float)(i_h - k_h) / (float)h_s) + 1;
-  int o_num = o_w * o_h * o_c;
-  int output_data[o_num];
-  for (int i = 0; i < o_num; i++) {
-    output_data[i] = 0;
-  }
-  for (int i_o_c = 0; i_o_c < o_c; i_o_c++) {
-    for (int i_o_h = 0; i_o_h < o_h; i_o_h++) {
-      for (int i_o_w = 0; i_o_w < o_w; i_o_w++) {
+  int output_data[30];
+#pragma HLS ARRAY_PARTITION variable = output_data complete dim = 0
+  int ind = 0;
+  for (int i_o_h = 0; i_o_h < o_h; i_o_h++) {
+    for (int i_o_w = 0; i_o_w < o_w; i_o_w++) {
+      for (int i_o_c = 0; i_o_c < o_c; i_o_c++) {
+        output_data[i_o_c] = 0;
         for (int i_k_c = 0; i_k_c < k_c; i_k_c++) {
           for (int i_k_h = 0; i_k_h < k_h; i_k_h++) {
             for (int i_k_w = 0; i_k_w < k_w; i_k_w++) {
-              output_data[i_o_h * o_w * o_c + i_o_w * o_c + i_o_c] +=
-                  weight[i_k_h * k_w * k_c * o_c + i_k_w * k_c * o_c +
-                         i_k_c * o_c + i_o_c] *
-                  data[((i_o_h)*h_s + i_k_h) * i_w * k_c +
-                       ((i_o_w)*w_s + i_k_w) * k_c + i_k_c];
+#pragma HLS PIPELINE
+              int ind1 = i_k_h * k_w * k_c * o_c + i_k_w * k_c * o_c +
+                         i_k_c * o_c + i_o_c;
+              int ind2 = ((i_o_h)*h_s + i_k_h) * i_w * k_c +
+                         ((i_o_w)*w_s + i_k_w) * k_c + i_k_c;
+              int8_t weight_t = weight[ind1];
+              int8_t data_t = data[ind2];
+              output_data[i_o_c] += weight_t * data_t;
             }
           }
         }
-        output_data[i_o_h * o_w * o_c + i_o_w * o_c + i_o_c] +=
+        output_data[i_o_c] +=
             ((input_q + weight_q - bias_q) > 0
                  ? (bias[i_o_c] << (input_q + weight_q - bias_q))
                  : (bias[i_o_c] >> (-input_q - weight_q + bias_q)));
-        output_data[i_o_h * o_w * o_c + i_o_w * o_c + i_o_c] *= bn_m1[i_o_c];
-        output_data[i_o_h * o_w * o_c + i_o_w * o_c + i_o_c] +=
+        output_data[i_o_c] *= bn_m1[i_o_c];
+        output_data[i_o_c] +=
             ((input_q + weight_q + m1_q - m2_q) > 0
                  ? (bn_m2[i_o_c] << (input_q + weight_q + m1_q - m2_q))
                  : (bn_m2[i_o_c] >> (-input_q - weight_q - m1_q + m2_q)));
-        if (relu && output_data[i_o_h * o_w * o_c + i_o_w * o_c + i_o_c] < 0) {
-          output_data[i_o_h * o_w * o_c + i_o_w * o_c + i_o_c] = 0;
+        if (relu && output_data[i_o_c] < 0) {
+          output_data[i_o_c] = 0;
         }
-        output_data_q[i_o_h * o_w * o_c + i_o_w * o_c + i_o_c] =
+        output_data_q[ind++] =
             (out_q - input_q - weight_q - m1_q) > 0
-                ? (output_data[i_o_h * o_w * o_c + i_o_w * o_c + i_o_c]
-                   << (out_q - input_q - weight_q - m1_q))
-                : (output_data[i_o_h * o_w * o_c + i_o_w * o_c + i_o_c] >>
-                   (-out_q + input_q + weight_q + m1_q));
+                ? (int8_t)(output_data[i_o_c]
+                           << (out_q - input_q - weight_q - m1_q))
+                : (int8_t)(output_data[i_o_c] >>
+                           (-out_q + input_q + weight_q + m1_q));
       }
     }
   }

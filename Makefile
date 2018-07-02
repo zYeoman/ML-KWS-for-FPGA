@@ -8,7 +8,7 @@ SRCDIR := src
 BUILDDIR := build
 INCLUDEDIR := include
 TARGET := kws
-CFLAGS := -Wall -O3 -I./$(INCLUDEDIR)
+CFLAGS := -Wall -Wno-unknown-pragmas -O3 -I./$(INCLUDEDIR)
 LIBS := -lm
 SRCEXT := cpp
 
